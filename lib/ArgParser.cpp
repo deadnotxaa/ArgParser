@@ -59,7 +59,9 @@ bool ArgumentParser::ArgParser::Parse(int argc, char** argv) {
         }
 
         if (IsIntPositionalArgument()) {
-            AddIntArgumentValue(GetPositionalIntArgumentName(), std::strtoll(argv[i], nullptr, 10));
+            if (std::all_of(argv[i], argv[i] + std::strlen(argv[i]), ::isdigit)) {
+                AddIntArgumentValue(GetPositionalIntArgumentName(), std::strtoll(argv[i], nullptr, 10));
+            }
         } else {
             AddStringArgumentValue(GetPositionalStringArgumentName(), argv[i]);
         }
@@ -77,13 +79,13 @@ ArgumentParser::IntArgument& ArgumentParser::ArgParser::AddIntArgument(char shor
 ArgumentParser::StringArgument& ArgumentParser::ArgParser::AddStringArgument(char short_name, const char* full_name, const char* description) {
     string_arguments_.emplace_back(StringArgument(short_name, full_name, description));
 
-    return *string_arguments_.end();
+    return string_arguments_[string_arguments_.size() - 1];
 }
 
 ArgumentParser::FlagArgument& ArgumentParser::ArgParser::AddFlagArgument(char short_name, const char* full_name, const char* description) {
     flag_arguments_.emplace_back(FlagArgument(short_name, full_name, description));
 
-    return *flag_arguments_.end();
+    return flag_arguments_[flag_arguments_.size() - 1];
 }
 
 bool ArgumentParser::ArgParser::IsIntArgument(char short_name, const char* full_name) {
@@ -335,6 +337,40 @@ bool ArgumentParser::ArgParser::CheckParserInput() {
     }
 
     return true;
+}
+
+int64_t ArgumentParser::ArgParser::GetIntValue(const char* full_name) const {
+    for (auto& i : int_arguments_) {
+        if (i.full_name_ == full_name) {
+            return i.value_;
+        }
+    }
+
+    return NULL;
+}
+
+const char* ArgumentParser::ArgParser::GetStringValue(const char* full_name) const {
+    for (auto& i : string_arguments_) {
+        if (i.full_name_ == full_name) {
+            return i.value_;
+        }
+    }
+
+    return nullptr;
+}
+
+bool ArgumentParser::ArgParser::GetFlagValue(const char* full_name) const {
+    for (auto& i : flag_arguments_) {
+        if (i.full_name_ == full_name) {
+            return i.value_;
+        }
+    }
+
+    return false;
+}
+
+const char *ArgumentParser::ArgParser::HelpDescription() {
+    return nullptr;
 }
 
 ArgumentParser::Argument::Argument(char short_name, const char* full_name, const char* description)

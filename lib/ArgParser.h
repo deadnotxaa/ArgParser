@@ -129,6 +129,11 @@ public:
     bool IsIntPositionalArgument();
     bool CheckParserInput();
 
+    int64_t GetIntValue(const char*) const;
+    const char* GetStringValue(const char*) const;
+    bool GetFlagValue(const char*) const;
+
+    static const char* HelpDescription();
 private:
     const char* parser_name_{};
 
