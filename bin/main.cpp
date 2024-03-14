@@ -2,6 +2,6 @@
 #include <iostream>
 
 int main(int argc, char** argv) {
-    std::cout << "a";
+    ArgumentParser::ArgParser parser("parse");
     return 0;
 }
